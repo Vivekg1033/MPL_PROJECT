@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1071625899264",
+    "project_id": "team-finder10",
+    "storage_bucket": "team-finder10.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1071625899264:android:2aa49aa9e091bab5e837e5",
+        "android_client_info": {
+          "package_name": "com.example.sportify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRadLdPfE2uuyVSluu5-gMoIwrhicmBmU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1071625899264:android:6279a2db68bdf3a6e837e5",
+        "android_client_info": {
+          "package_name": "com.example.team_finder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRadLdPfE2uuyVSluu5-gMoIwrhicmBmU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
