@@ -22,15 +22,20 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void _signup(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
+      String fullName = _fullNameController.text.trim();
       String email = _emailController.text.trim();
       String password = _passwordController.text.trim();
 
-      var user = await _authService.signUp(email, password);
+      var user = await _authService.signUp(email, password, fullName);
       if (user != null) {
-        _showMessage("Verification email sent. Please verify before logging in.", Colors.green);
-        Navigator.pushReplacementNamed(context, '/'); // Redirect to login
+        _showMessage("Signup Successful! Please verify your email.", Colors.green);
+        
+        // Delay navigation to give time for UI to update
+        Future.delayed(Duration(seconds: 2), () {
+          Navigator.pushReplacementNamed(context, '/'); // Redirect to login
+        });
       } else {
-        _showMessage("Signup failed. Please try again.", Colors.red);
+        _showMessage("Signup Failed. Try again.", Colors.red);
       }
     }
   }

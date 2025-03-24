@@ -14,26 +14,49 @@ class FindTeamsScreen extends StatefulWidget {
 class _FindTeamsScreenState extends State<FindTeamsScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final User? _currentUser = FirebaseAuth.instance.currentUser;
+  bool _showJoinedTeams = false; // Toggle for filtering
+
+  Stream<QuerySnapshot> _getTeams() {
+    if (_showJoinedTeams) {
+      return _firestore
+          .collection('teams')
+          .where('members', arrayContains: _currentUser!.uid) // Fetch only joined teams
+          .snapshots();
+    } else {
+      return _firestore.collection('teams').snapshots(); // Fetch all teams
+    }
+  }
 
   void _toggleJoinTeam(String teamId, List<String> members) async {
     if (_currentUser == null) return;
 
     bool isJoined = members.contains(_currentUser!.uid);
     List<String> updatedMembers = isJoined
-        ? members.where((id) => id != _currentUser!.uid).toList()  // Remove user
-        : [...members, _currentUser!.uid];  // Add user
+        ? members.where((id) => id != _currentUser!.uid).toList()
+        : [...members, _currentUser!.uid];
 
     try {
       DocumentReference teamRef = _firestore.collection('teams').doc(teamId);
-      DocumentSnapshot teamSnapshot = await teamRef.get();
+      DocumentReference userRef = _firestore.collection('users').doc(_currentUser!.uid);
 
-      if (!teamSnapshot.exists) {
-        print("Error: Team document not found!");
-        return;
-      }
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        DocumentSnapshot teamSnapshot = await transaction.get(teamRef);
+        DocumentSnapshot userSnapshot = await transaction.get(userRef);
 
-      await teamRef.update({'members': updatedMembers});
-      setState(() {});  // Refresh UI after update
+        if (!teamSnapshot.exists) {
+          print("Error: Team document not found!");
+          return;
+        }
+
+        transaction.update(teamRef, {'members': updatedMembers});
+        transaction.update(userRef, {
+          'joinedTeams': isJoined
+              ? FieldValue.arrayRemove([teamId])
+              : FieldValue.arrayUnion([teamId])
+        });
+      });
+
+      setState(() {}); // Refresh UI after update
     } catch (e) {
       print("Error updating team members: $e");
     }
@@ -42,9 +65,22 @@ class _FindTeamsScreenState extends State<FindTeamsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(AppConstants.findTeamsLabel)),
+      appBar: AppBar(
+        title: Text(AppConstants.findTeamsLabel),
+        actions: [
+          IconButton(
+            icon: Icon(_showJoinedTeams ? Icons.visibility_off : Icons.visibility),
+            tooltip: _showJoinedTeams ? "Show All Teams" : "Show Joined Teams",
+            onPressed: () {
+              setState(() {
+                _showJoinedTeams = !_showJoinedTeams; // Toggle filter
+              });
+            },
+          ),
+        ],
+      ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: _firestore.collection('teams').snapshots(),
+        stream: _getTeams(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
 
@@ -59,6 +95,15 @@ class _FindTeamsScreenState extends State<FindTeamsScreen> {
             );
           }).toList();
 
+          if (teams.isEmpty) {
+            return Center(
+              child: Text(
+                _showJoinedTeams ? "No joined teams found" : "No teams available",
+                style: TextStyle(fontSize: 18, color: Colors.grey),
+              ),
+            );
+          }
+
           return ListView.builder(
             itemCount: teams.length,
             itemBuilder: (context, index) {
@@ -68,7 +113,7 @@ class _FindTeamsScreenState extends State<FindTeamsScreen> {
               return TeamCard(
                 team: team,
                 isJoined: isJoined,
-                onJoinToggle: (teamId, members) => _toggleJoinTeam(teamId, members), 
+                onJoinToggle: (teamId, members) => _toggleJoinTeam(teamId, members),
               );
             },
           );

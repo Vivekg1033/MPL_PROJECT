@@ -96,7 +96,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         obscureText: true,
                         validator: (value) => value!.length < 6 ? "Password must be at least 6 characters" : null,
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 10),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/resetPassword');
+                          },
+                          child: Text(
+                            "Forgot Password?",
+                            style: TextStyle(color: AppConstants.primaryColor),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10),
                       ElevatedButton(
                         onPressed: () => _login(context),
                         style: ElevatedButton.styleFrom(

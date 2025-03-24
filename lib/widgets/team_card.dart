@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:team_finder_app/core/constants.dart';
 import 'package:team_finder_app/models/team.dart';
+import 'package:team_finder_app/screens/team_details_screen.dart';
 
 class TeamCard extends StatelessWidget {
   final Team team;
@@ -40,6 +41,12 @@ class TeamCard extends StatelessWidget {
             style: TextStyle(color: Colors.white),
           ),
         ),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => TeamDetailsScreen(teamId: team.id)),
+          );
+        },
       ),
     );
   }

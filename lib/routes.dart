@@ -6,6 +6,7 @@ import 'package:team_finder_app/screens/create_team_screen.dart';
 import 'package:team_finder_app/screens/find_teams_screen.dart';
 import 'package:team_finder_app/screens/chat_screen.dart';
 import 'package:team_finder_app/screens/settings_screen.dart';
+import 'package:team_finder_app/screens/reset_password_screen.dart';
 
 final Map<String, WidgetBuilder> appRoutes = {
   '/': (context) => LoginScreen(),
@@ -15,4 +16,5 @@ final Map<String, WidgetBuilder> appRoutes = {
   '/findTeams': (context) => FindTeamsScreen(),
   '/chat': (context) => ChatScreen(),
   '/settings': (context) => SettingsScreen(),
+  '/resetPassword': (context) => ResetPasswordScreen(),
 };
